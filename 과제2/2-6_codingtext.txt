@@ -1,0 +1,17 @@
+#include <string>
+#include <vector>
+#include <iostream>
+#include <math.h>
+using namespace std;
+long long solution(int r1, int r2)
+{
+  long long answer = 0;
+  for (int x = 1; x <= r2; x++)
+  {
+      long long maxY = floor(sqrt((long long)r2 * r2 - (long long)x * x));
+      long long minY = x < r1 ? ceil(sqrt((long long)r1 * r1 - (long long)x * x)) : 0;
+      answer += (maxY - minY + 1);
+  }   
+  answer = answer * 4;
+  return answer;
+}

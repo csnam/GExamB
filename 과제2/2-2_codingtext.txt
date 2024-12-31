@@ -1,0 +1,17 @@
+#include <string>
+#include <vector>
+
+using namespace std;
+
+int solution(string my_string, string is_prefix) {
+   int answer = 0;
+    int cntcomp = is_prefix.length();
+    if (my_string.substr(0, cntcomp) == is_prefix)
+    {
+        answer = 1;
+    }
+    else {
+        answer = 0;
+    }
+    return answer;
+}

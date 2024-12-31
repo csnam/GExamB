@@ -1,0 +1,29 @@
+#include <string>
+#include <vector>
+#include <algorithm> // std::search
+using namespace std;
+
+int solution(vector<int> input) {
+  int count = 0;
+ vector<int> v;
+
+ if (input.size() > 1000000) return 0;
+ if (input.size() < 1) return 0;
+ for (int it : input)
+ {
+     v.push_back(it);
+
+     if (v.size() > 3)
+     {
+         if (vector<int>(v.end() - 4, v.end()) == vector<int>{1, 2, 3, 1})
+         {
+             count++;
+             for (int i = 0; i < 4; i++)
+             {
+                 v.pop_back();
+             }
+         }
+     }
+ }
+ return count;
+}

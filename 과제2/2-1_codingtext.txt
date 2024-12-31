@@ -1,0 +1,21 @@
+#include <string>
+#include <vector>
+
+using namespace std;
+
+int solution(int n, int k) {
+    int answer = 0;
+    int price_yang = 12000;
+    int price_water = 2000;
+    int cnt_service = 0;
+    if (n > 0 && n < 1000)
+    {
+        cnt_service = n / 10;
+        if (cnt_service > 0) {
+            k -= cnt_service;
+        }
+        answer = n * price_yang + k * price_water;
+    }
+
+    return answer;
+}
