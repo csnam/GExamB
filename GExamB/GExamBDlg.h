@@ -15,6 +15,7 @@ public:
 
 
 	CScreen* m_pScreen;
+	CRect	 m_scrRect;
 	
 
 // 대화 상자 데이터입니다.
@@ -29,7 +30,7 @@ public:
 // 구현입니다.
 
 private:
-	
+	bool CheckInputValue();
 
 protected:
 	HICON m_hIcon;
@@ -41,7 +42,9 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedBtndraw();
+	afx_msg
+		
+	void OnBnClickedBtndraw();
 	afx_msg void OnDestroy();
 	afx_msg void OnBnClickedBtnload();
 	

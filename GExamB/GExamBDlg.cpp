@@ -12,7 +12,7 @@
 #define new DEBUG_NEW
 #endif
 
-
+#define  MIN_START_XY  100
 // 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
 
 class CAboutDlg : public CDialogEx
@@ -111,36 +111,33 @@ BOOL CGExamBDlg::OnInitDialog()
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 
-	int nX1 = 100;
-	int nY1 = 100;
-	int nX2 = 720;
-	int nY2 = 480;
+	int nX1 = MIN_START_XY;
+	int nY1 = MIN_START_XY;
 	int nCircleount = 10;
-	// 입력값 초기값
-	SetDlgItemInt(IDC_EDIT_X1, nX1);
-	SetDlgItemInt(IDC_EDIT_Y1, nY1);
-	SetDlgItemInt(IDC_EDIT_X2, nX2);
-	SetDlgItemInt(IDC_EDIT_Y2, nY2);
-	SetDlgItemInt(IDC_EDIT_COUNT, nCircleount);
 
 	CRect rect(0, 0, 720, 480);
 	CWnd* pWnd = GetDlgItem(IDC_SCREEN_AREA);
 	pWnd->GetWindowRect(rect);
 	ScreenToClient(rect);
+	m_scrRect = rect;
 
-	SetDlgItemInt(IDC_EDIT_X2, rect.Width() - 100);
-	SetDlgItemInt(IDC_EDIT_Y2, rect.Height()-100);
-	
+	// 입력값 초기값
+	SetDlgItemInt(IDC_EDIT_X1, nX1);
+	SetDlgItemInt(IDC_EDIT_Y1, nY1);
+	SetDlgItemInt(IDC_EDIT_X2, rect.Width() - MIN_START_XY);
+	SetDlgItemInt(IDC_EDIT_Y2, rect.Height() - MIN_START_XY);
+	SetDlgItemInt(IDC_EDIT_COUNT, nCircleount);
+
 	pWnd = GetDlgItem(IDC_LBL_SCRINFO);
 	CString strText;
 	strText.Format(_T("screen size %d X %d"), rect.Width(), rect.Height());
 	pWnd->SetWindowText(strText);
-	
+
 	// 스크린 생성
 	m_pScreen = new CScreen();
 	m_pScreen->Create(NULL, _T(""), WS_CHILD | WS_VISIBLE | WS_BORDER, rect, this, 0);
 
-	
+
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -195,7 +192,29 @@ HCURSOR CGExamBDlg::OnQueryDragIcon()
 }
 
 
+bool CGExamBDlg::CheckInputValue()
+{
+	bool bRet = true;
+	int nX1 = GetDlgItemInt(IDC_EDIT_X1);
+	int nY1 = GetDlgItemInt(IDC_EDIT_Y1);
+	int nX2 = GetDlgItemInt(IDC_EDIT_X2);
+	int nY2 = GetDlgItemInt(IDC_EDIT_Y2);
 
+	if (nX1 < MIN_START_XY ||
+		nY1 < MIN_START_XY) {
+		TRACE(_T("입력값의 법위를 확인하세요 ( x1, y1 > 100 )"));
+		return false;
+	}
+	if (nY2 > (m_scrRect.Height() - MIN_START_XY) ||
+		nX2 > (m_scrRect.Width() - MIN_START_XY) ||
+		nX2 < nX1 + MIN_START_XY ||
+		nY2 < nY1 + MIN_START_XY)
+	{
+		TRACE(_T("입력값의 법위를 확인하세요 ( x1+100, y1+100 < x2,y2 < 스크린 크기 - 100)"));
+		return false;
+	}
+	return bRet;
+}
 void CGExamBDlg::OnBnClickedBtndraw()
 {
 	CRect rect;
@@ -204,14 +223,14 @@ void CGExamBDlg::OnBnClickedBtndraw()
 	int nY1 = GetDlgItemInt(IDC_EDIT_Y1);
 	int nX2 = GetDlgItemInt(IDC_EDIT_X2);
 	int nY2 = GetDlgItemInt(IDC_EDIT_Y2);
-	int nCircleount = GetDlgItemInt(IDC_EDIT_COUNT);
-	TRACE("input ( %d,%d )  ( %d ,%d ) c=%d\n", nX1, nY1, nX2, nY2, nCircleount);
-
-	if (m_pScreen) {
-		m_pScreen->GetWindowRect(&rect);
-		m_pScreen->MakeCircle(rect.Width(), rect.Height(),CPoint(nX1,nY1),CPoint(nX2,nY2));
+	
+	if (CheckInputValue())
+	{
+		if (m_pScreen) {
+			m_pScreen->GetWindowRect(&rect);
+			m_pScreen->MakeCircle(rect.Width(), rect.Height(), CPoint(nX1, nY1), CPoint(nX2, nY2));
+		}
 	}
-
 }
 
 void CGExamBDlg::OnBnClickedBtnAction()
@@ -219,13 +238,14 @@ void CGExamBDlg::OnBnClickedBtnAction()
 	int nCircleount = GetDlgItemInt(IDC_EDIT_COUNT);
 
 	if (nCircleount > 100 ||  nCircleount < 5) {
-		MessageBox(_T("5 에서 100 사이의 값을 입력하세요"));
+		TRACE(_T("5 에서 100 사이의 값을 입력하세요"));
+		return;
 	}
+		
 	if (m_pScreen) {
 		m_pScreen->MoveCircleAndSaveThread(nCircleount);
 
 	}
-		
 
 }
 
@@ -243,6 +263,7 @@ void CGExamBDlg::OnBnClickedBtnload()
 {
 	static TCHAR BASED_CODE szFilter[] = _T("이미지 파일(*.BMP,*.PNG *.JPG) | *.BMP;*.PNG;*.JPG |모든파일(*.*)|*.*||");
 	CFileDialog dlg(TRUE, _T("*.bmp"), _T("image"), OFN_HIDEREADONLY, szFilter);
+		
 	if (IDOK == dlg.DoModal())
 	{
 		CString pathName = dlg.GetPathName();
@@ -253,25 +274,10 @@ void CGExamBDlg::OnBnClickedBtnload()
 	
 }
 
-
 void CGExamBDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
-
-	//CRect rect;
-	//CRect scr_rect;
-	//if (m_pScreen)
-	//{
-	//	CWnd* pGroupB = GetDlgItem(IDC_BtnLoad);
-	//	pGroupB->GetWindowRect(&rect);
-	//	ScreenToClient(&rect);
-	//	// Screen Area		
-	//	scr_rect.left = rect.left;
-	//	scr_rect.top = rect.bottom  + 10;
-	//	scr_rect.right = cx - 20;
-	//	scr_rect.bottom = cy - 20;
-	//	m_pScreen->MoveWindow(&scr_rect);
-	//}
+	
 }
 
 

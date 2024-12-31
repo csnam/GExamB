@@ -68,11 +68,6 @@ void CScreen::DrawXShape(CDC* pDC, float dCenterX, float dCenterY)
 
 }
 
-
-
-
-
-
 void CScreen::MakeCircle(int nWidth, int nHeight,CPoint startPos,CPoint endPos)
 {
 	m_startXY = startPos;
@@ -86,15 +81,9 @@ void CScreen::MakeCircle(int nWidth, int nHeight,CPoint startPos,CPoint endPos)
 	m_nRadius = min(min(startPos.x, randomRadius), min(startPos.y, randomRadius));
 	DrawCircleData(m_startXY.x, m_startXY.y, m_nRadius, 255);
 
-
-	CClientDC dc(this);
-	if (m_image) {
-		m_image.Draw(dc, 0, 0);
-
-	}
+	ImageDisplay();
 
 }
-
 
 void CScreen::MoveCircleAndSaveThread(int nCircleCount)
 {
@@ -125,7 +114,6 @@ void CScreen::MoveCircleAndSave()
 	}
 	
 }
-
 
 int CScreen::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {

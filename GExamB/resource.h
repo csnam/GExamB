@@ -18,6 +18,7 @@
 #define IDC_LBL_INFO                    1009
 #define IDC_LBL_SCRINFO                 1010
 #define IDC_SCREEN_AREA                 1011
+#define IDC_LBL_INFO2                   1012
 
 // Next default values for new objects
 // 
